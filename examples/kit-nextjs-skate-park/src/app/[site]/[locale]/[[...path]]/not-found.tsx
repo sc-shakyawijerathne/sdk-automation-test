@@ -9,10 +9,16 @@ import { NextIntlClientProvider } from 'next-intl';
 export default async function NotFound() {
   const { site, locale } = getCachedPageParams();
 
-  const page = await client.getErrorPage(ErrorPage.NotFound, {
-    site: site || scConfig.defaultSite,
-    locale: locale || scConfig.defaultLanguage,
-  });
+  let page = null;
+  try {
+    page = await client.getErrorPage(ErrorPage.NotFound, {
+      site: site || scConfig.defaultSite,
+      locale: locale || scConfig.defaultLanguage,
+    });
+  } catch {
+    // Sitecore error page is not configured or the API is unavailable.
+    // Fall through to the static fallback below.
+  }
 
   if (page) {
     return (
